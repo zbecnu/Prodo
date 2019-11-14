@@ -4,24 +4,24 @@ const os = require('os');
 // show
 if(cluster.isMaster){
     for(let i=0; i<os.cpus().length/2;i++){
-        
-       const worker =  cluster.fork();
 
+       const worker =  cluster.fork();
        let missping = 0;
 
-       setInterval(()=>{
+       let inter = setInterval(()=>{
+           console.log('ping');
             worker.send('ping');    
             missping++;
-
             if(missping >=3){
-                worker.exit(1);
+                clearInterval(inter);
+                process.kill(worker.process.pid);
+                // worker.exit(1);
             }
-
-       },3000);
-
+       },1000);
 
        worker.on('message',(msg)=>{
             if(msg == 'pong'){
+                console.log('pong');
                 missping--;
             }
        });
@@ -35,6 +35,7 @@ if(cluster.isMaster){
 
     }
 }else{
+    
     // showsmsg.push(num);
     // 检测异常
     process.on('uncaughtException',(err)=>{
