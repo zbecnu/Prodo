@@ -4,8 +4,11 @@ const os = require('os');
 // show
 if(cluster.isMaster){
     for(let i=0; i<os.cpus().length/2;i++){
+        
        const worker =  cluster.fork();
+
        let missping = 0;
+
        setInterval(()=>{
             worker.send('ping');    
             missping++;
